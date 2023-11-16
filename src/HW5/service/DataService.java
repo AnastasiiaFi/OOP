@@ -1,0 +1,73 @@
+package HW5.service;
+
+
+import HW5.data.Student;
+import HW5.data.Teacher;
+import HW5.data.Type;
+import HW5.data.User;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+public class DataService {
+    private List<User> userList;
+
+    public DataService() {
+        this.userList = new ArrayList<>();
+    }
+
+    public void create(String firstName, String secondName,
+                       String patronymic, LocalDate dateOfBirth, Type type){
+        long id = getFreeId(type);
+        if(Type.STUDENT == type){
+            Student student = new Student(firstName,secondName,patronymic,dateOfBirth, id);
+            userList.add(student);
+        }
+        else if(Type.TEACHER == type){
+            Teacher teacher = new Teacher(firstName,secondName,patronymic,dateOfBirth,id);
+            userList.add(teacher);
+        }
+    }
+
+    private long getFreeId(Type type){
+        boolean itsStudent = Type.STUDENT == type;
+        long lastId = 1;
+        for (User user : userList) {
+            if(user instanceof Teacher && !itsStudent){
+                lastId = (((Teacher) user).getTeacherId() + 1);
+            }
+            if(user instanceof Student && itsStudent){
+                lastId = (((Student) user).getStudentId() + 1);
+            }
+
+        }
+        return lastId;
+    }
+
+    public User getUserById(Type type, int id){
+        boolean itsStudent = Type.STUDENT == type;
+        for(User user: userList){
+            if(user instanceof Teacher && !itsStudent && ((Teacher) user).getTeacherId() == id){
+                return user;
+            }
+            if(user instanceof Student && itsStudent && ((Student) user).getStudentId() == id){
+                return user;
+            }
+        }
+        return null;
+    }
+    public List<User> getAllUser(){
+        return userList;
+    }
+
+    public List<User> getAllStudent(){
+        List<User> resultList = new ArrayList<>();
+        for(User user : userList){
+            if (user instanceof Student){
+                resultList.add(user);
+            }
+        }
+        return resultList;
+    }
+}
